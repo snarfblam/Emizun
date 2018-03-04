@@ -61,9 +61,9 @@ function displayTable(data, columnLayout, tableStyle, dataTransform, outputFunct
     data.forEach(function (item) {
         if (item == tableSeparator) {
             outputFunction(
-                finalStyle.left +
+                finalStyle.interesctionLeft +
                 createTableSeparator(columnLayout, finalStyle.intersectionMiddle, finalStyle.separator) +
-                finalStyle.right);
+                finalStyle.intersectionRight);
         } else {
             if (dataTransform) item = dataTransform(item);
             outputFunction(
@@ -92,6 +92,8 @@ var tableStyles = {
         intersectionTop: '-+-',
         intersectionMiddle: '-+-',
         intersectionBottom: '-+-',
+        interesctionLeft: "",
+        intersectionRight: "",  
         topLeft: "",
         left: "",
         bottomLeft: "",
@@ -105,6 +107,8 @@ var tableStyles = {
         intersectionTop: '─┬─',
         intersectionMiddle: '─┼─',
         intersectionBottom: '─┴─',
+        interesctionLeft: "├─",
+        intersectionRight: "─┤",    
         topLeft: "┌─",
         left: "│ ",
         bottomLeft: "└─",
