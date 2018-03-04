@@ -28,7 +28,7 @@ function tableize(values, widths, columnSeparator, ) {
     return result;
 }
 
-function tableSeparator(columnWidths, columnSeparator, separatorChar) {
+function createTableSeparator(columnWidths, columnSeparator, separatorChar) {
     var result = "";
     for (var i = 0; i < columnWidths.length; i++) {
         if (i > 0) result += columnSeparator;
@@ -55,14 +55,14 @@ function displayTable(data, columnLayout, tableStyle, dataTransform, outputFunct
     // doet
     outputFunction(
         finalStyle.topLeft +
-        tableSeparator(columnLayout, finalStyle.intersectionTop, finalStyle.separator) +
+        createTableSeparator(columnLayout, finalStyle.intersectionTop, finalStyle.separator) +
         finalStyle.topRight);
 
     data.forEach(function (item) {
         if (item == tableSeparator) {
             outputFunction(
                 finalStyle.left +
-                tableSeparator(columnLayout, finalStyle.intersectionMiddle, finalStyle.separator) +
+                createTableSeparator(columnLayout, finalStyle.intersectionMiddle, finalStyle.separator) +
                 finalStyle.right);
         } else {
             if (dataTransform) item = dataTransform(item);
@@ -75,7 +75,7 @@ function displayTable(data, columnLayout, tableStyle, dataTransform, outputFunct
 
     outputFunction(
         finalStyle.bottomLeft +
-        tableSeparator(columnLayout, finalStyle.intersectionBottom, finalStyle.separator) +
+        createTableSeparator(columnLayout, finalStyle.intersectionBottom, finalStyle.separator) +
         finalStyle.bottomRight);
 }
 
