@@ -7,7 +7,9 @@ function tableize(values, widths, columnSeparator, ) {
     for (var i = 0; i < values.length; i++) {
         if (i > 0 && columnSeparator) result += columnSeparator;
 
-        var value = (values[i] || "null").toString();
+        var value = values[i];
+        if (value == undefined || value == null) value = "";
+        value = value.toString();
         var width = widths[i] || 10;
         var rightAlign = width < 0;
         width = Math.abs(width);
