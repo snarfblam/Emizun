@@ -12,9 +12,6 @@ CREATE TABLE products (
 
 ALTER TABLE products
 ADD COLUMN product_sales INTEGER(11) AFTER stock_quantity;
-UPDATE products SET product_sales='0';
-UPDATE products SET product_sales='0' WHERE item_id >= 0;
-
 
 INSERT INTO `emizun`.`products` (`item_id`, `product_name`, `department_name`, `price`, `stock_quantity`) VALUES ('1', 'ShamWow', 'Home & Kitchen', '1995', '20');
 INSERT INTO `emizun`.`products` (`item_id`, `product_name`, `department_name`, `price`, `stock_quantity`) VALUES ('2', 'Snuggie', 'Home & Kitchen', '1980', '50');
@@ -26,6 +23,10 @@ INSERT INTO `emizun`.`products` (`item_id`, `product_name`, `department_name`, `
 INSERT INTO `emizun`.`products` (`item_id`, `product_name`, `department_name`, `price`, `stock_quantity`) VALUES ('8', 'Mighty Putty', 'Tools & Home Improvement', '1549', '60');
 INSERT INTO `emizun`.`products` (`item_id`, `product_name`, `department_name`, `price`, `stock_quantity`) VALUES ('9', 'Flex Seal', 'Tools & Home Improvement', '1299', '30');
 INSERT INTO `emizun`.`products` (`item_id`, `product_name`, `department_name`, `price`, `stock_quantity`) VALUES ('10', 'Music Bullet', 'Electronics', '2499', '40');
+
+UPDATE products SET product_sales='0';
+UPDATE products SET product_sales='0' WHERE item_id >= 0;
+
 
 CREATE TABLE departments (
     department_id INTEGER(11) AUTO_INCREMENT NOT NULL,

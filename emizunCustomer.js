@@ -32,8 +32,10 @@ function EmizunCustomer(emizunConnection) {
                 if (qty == 0) {
                     console.log(selectedItem.product_name + " has been removed from your cart.");
                 } else {
-                    console.log("Your total comes to " + util.formatCurrency(selectedItem.price * qty) + ". Please wait while we process your transaction...");
-                    return self._updateRow(selectedItem.item_id, selectedItem.stock_quantity - qty)
+                    var totalPrice = selectedItem.price * qty;
+                    var totalSales = selectedItem.product_sales + totalPrice;
+                    console.log("Your total comes to " + util.formatCurrency(totalPrice) + ". Please wait while we process your transaction...");
+                    return self._updateRow(selectedItem.item_id, selectedItem.stock_quantity - qty, totalSales)
                         .then(function () {
                             console.log("Your order has been placed!");
                         });
@@ -103,10 +105,11 @@ function EmizunCustomer(emizunConnection) {
     }
 
     /** Updates quantity for product in product table. Returns a promise.*/
-    EmizunCustomer.prototype._updateRow = function (id, qty) {
+    EmizunCustomer.prototype._updateRow = function (id, qty, totalSales) {
         return connection.query("UPDATE products SET ? WHERE ?", [
             {
                 stock_quantity: qty,
+                product_sales: totalSales,
             }, {
                 item_id: id,
             }
