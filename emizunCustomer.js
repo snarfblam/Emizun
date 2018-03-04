@@ -1,8 +1,6 @@
 require('./polyfill');
 var inquirer = require('inquirer');
-var mysql = require('mysql');
-
-
+var EmizunConnection = require('./EmizunConnection');
 
 /** Formats a string to use columns of the specified widths. */
 function tableize(values, widths, columnSeparator) {
@@ -26,81 +24,60 @@ function tableize(values, widths, columnSeparator) {
     return result;
 }
 
+/** Formats a number of cents into a string such as $1.99 */
 function formatCurrency(cents) {
     return "$" + (cents / 100).toFixed(2)
 }
 
-function EmizunConnection() {
-    this.connection = mysql.createConnection({
-        host: 'localhost',
-        port: 3306,
-        user: 'root',
-        password: 'sequelitis',
-        database: 'emizun',
-    });
-
-    this.connected = false;
-} { // methods
-
-    /** Connects to the database. Returns a promise. */
-    EmizunConnection.prototype.connect = function () {
-        var self = this;
-
-        return new Promise(function (resolve, reject) {
-            if (self.connected) resolve(self);
-
-            self.connection.connect(function (err) {
-                if (err) reject(err);
-
-                self.connected = true;
-                resolve(self);
-            });
-        });
-    };
-
-    EmizunConnection.prototype.disconnect = function () {
-        if (this.connected) {
-            this.connection.end();
-            this.connected = false;
-        }
-    };
-
-    /** Performs the specified query. Returns a promise. */
-    EmizunConnection.prototype.query = function (queryString, values) {
-        var self = this;
-
-        return new Promise(function (resolve, reject) {
-            if (values) {
-                self.connection.query(queryString, values, function (err, result) {
-                    if (err) reject(err);
-                    resolve(result);
-                });
-            } else {
-                self.connection.query(queryString, function (err, result) {
-                    if (err) reject(err);
-                    resolve(result);
-                });
-            }
-        })
-    };
-
-}
-
+/** Creates an EmizunCustomer object which queries the database and presents command-line prompts. */
 function EmizunCustomer(emizunConnection) {
     /** @type {EmizunConnection} */
     this.connection = emizunConnection;
-} { // methods
+} { // static
 
-    EmizunCustomer.prototype.presentUI = function () {
+    EmizunCustomer.formatProduct = function (dbEntry) {
+        return tableize([dbEntry.item_id, dbEntry.product_name, formatCurrency(dbEntry.price)], [8, 20, 10], ' | ');
     }
 
+    EmizunCustomer.formatProductShort = function (dbEntry) {
+        return dbEntry.product_name + " " + "(" + formatCurrency(dbEntry.price) + ")";
+    }
+
+} { // methods
+
+    /** Provides a series of customer prompts to the user and performs database queries on his behalf. */
+    EmizunCustomer.prototype.presentUI = function () {
+        var self = this;
+        var selectedItem;
+
+        return self._promptForProduct()
+            .then(function (item) {
+                selectedItem = item;
+
+                return self._promptForQuantity(item.product_name, item.stock_quantity);
+            }).then(function (qty) {
+                if (qty == 0) {
+                    console.log(selectedItem.product_name + " has been removed from your cart.");
+                } else {
+                    console.log("Your total comes to " + formatCurrency(selectedItem.price * qty) + ". Please wait while we process your transaction...");
+                    return self._updateRow(selectedItem.item_id, selectedItem.stock_quantity - qty)
+                        .then(function () {
+                            console.log("Your order has been placed!");
+                        });
+                }
+
+            }).then(function () {
+                return self._promptForAnotherTransaction();
+            });
+    };
+
     /** Retrieves the catalog and prompts the user to select a product. Returns a promise that resolves to the selected product database result. */
-    EmizunCustomer.prototype.promptForProduct = function () {
+    EmizunCustomer.prototype._promptForProduct = function () {
         var self = this;
 
-        return this.queryProducts()
+        return this._queryProducts()
             .then(function (result) {
-                var productList = self.createProductList(result);
+                var productList = self._createProductList(result);
                 return inquirer.prompt([{
                     type: 'list',
                     message: 'Select a product.',
@@ -113,7 +90,7 @@ function EmizunCustomer(emizunConnection) {
     }
 
     /** Prompts the user to enter a number of items. Returns a promise that resolves to a number. */
-    EmizunCustomer.prototype.promptForQuantity = function (itemName, maxQty) {
+    EmizunCustomer.prototype._promptForQuantity = function (itemName, maxQty) {
         var self = this;
 
         return inquirer.prompt([{
@@ -122,47 +99,54 @@ function EmizunCustomer(emizunConnection) {
             name: 'qty'
         }]).then(function (result) {
             var qty = parseInt(result.qty);
-            
+
             if (isNaN(qty) || qty < 0 || qty > maxQty) {
                 // TRY AGAIN, JERK!
                 console.log("A valid number between 0 and " + maxQty + " is required.");
-                return self.promptForQuantity(itemName, maxQty);
+                return self._promptForQuantity(itemName, maxQty);
             } else {
                 return qty;
             }
         });
     }
 
+    /** Prompts the user to do another transaction. Returns a promise that resolves when the user is done. */
+    EmizunCustomer.prototype._promptForAnotherTransaction = function () {
+        var self = this;
+
+        return inquirer.prompt([{
+            type: 'confirm',
+            message: 'Would you like another transaction?',
+            name: 'again',
+        }]).then(function (result) {
+            if (result.again) {
+                return self.presentUI();
+            }
+        });
+    }
+
     /** Retrieves a product list. Returns a promise. */
-    EmizunCustomer.prototype.queryProducts = function () {
+    EmizunCustomer.prototype._queryProducts = function () {
         return this.connection.query("SELECT * FROM products");
     }
 
-    EmizunCustomer.prototype.createProductList = function (dbEntries) {
+    EmizunCustomer.prototype._createProductList = function (dbEntries) {
         var self = this;
 
         var results = [];
         dbEntries.forEach(e => {
             results.push({
-                name: self.formatProduct(e),
+                name: EmizunCustomer.formatProduct(e),
                 value: e,
-                short: self.formatProductShort(e),
+                short: EmizunCustomer.formatProductShort(e),
             });
         });
 
         return results;
     }
 
-    EmizunCustomer.prototype.formatProduct = function (dbEntry) {
-        return tableize([dbEntry.item_id, dbEntry.product_name, formatCurrency(dbEntry.price)], [8, 20, 10], ' | ');
-    }
-
-    EmizunCustomer.prototype.formatProductShort = function (dbEntry) {
-        return dbEntry.product_name + " " + "(" + formatCurrency(dbEntry.price) + ")";
-    }
-
     /** Updates quantity for product in product table. Returns a promise.*/
-    EmizunCustomer.prototype.updateRow = function (id, qty) {
+    EmizunCustomer.prototype._updateRow = function (id, qty) {
         return connection.query("UPDATE products SET ? WHERE ?", [
             {
                 stock_quantity: qty,
@@ -177,30 +161,12 @@ function EmizunCustomer(emizunConnection) {
 var connection = new EmizunConnection();
 var customer = new EmizunCustomer(connection);
 
-var selectedItem;
-
 connection.connect()
     .then(function () {
-        return connection.query("SELECT * FROM products");
-    }).then(function (result) {
-        return customer.promptForProduct();
-    }).then(function (item) {
-        // console.log("SELECTION: ", id);
-        selectedItem = item;
-
-        return customer.promptForQuantity(item.product_name, item.stock_quantity);
-    }).then(function (qty) {
-        if (qty == 0) {
-            console.log(selectedItem.product_name + " has been removed from your cart.");
-        } else {
-            console.log("Your total comes to " + formatCurrency(selectedItem.price * qty) + ". Please wait while we process your transaction...");
-            return customer.updateRow(selectedItem.item_id, selectedItem.stock_quantity - qty)
-                .then(function () { 
-                    console.log("Your order has been placed!");
-                });
-        }
+        return customer.presentUI();
     }).catch(function (err) {
         console.log(err);
     }).then(function () {
+        console.log("Thanks for shopping.")
         connection.disconnect();
     });
