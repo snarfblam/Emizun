@@ -238,6 +238,10 @@ function Prompt() {
     Prompt.prototype.show = function () {
         return inquirer.prompt(this.prompts);
     }
+
+    Prompt.prototype.then = function (onResolved, onRejected) {
+        return this.show().then(onResolved, onRejected);
+    }
 }
 
 
