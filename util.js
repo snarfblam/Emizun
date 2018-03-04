@@ -22,6 +22,16 @@ function tableize(values, widths, columnSeparator) {
     return result;
 }
 
+function tableSeparator(columnWidths, columnSeparator) {
+    var result = "";
+    for (var i = 0; i < columnWidths.length; i++) {
+        if (i > 0) result += columnSeparator;
+        result += ('-').repeat(columnWidths[i]);
+    }
+
+    return result;
+}
+
 /** Formats a number of cents into a string such as $1.99 */
 function formatCurrency(cents) {
     return "$" + (cents / 100).toFixed(2)
