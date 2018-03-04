@@ -66,10 +66,13 @@ function EmizunManager(connection) {
                         console.log(negative ? "Warning: minimum quantity is 0." : "Your request is being processed.");
 
                         return this._updateQty(product.item_id, newQty)
-                            .then(() => { 
+                            .then(() => {
                                 console.log("Transaction complete.");
                             });
                     });
+            }
+            case modes.addNewProduct: {
+                return this._addNewProduct();
             }
             default:
                 return Promise.reject(new Error("Unknown manager mode"));
@@ -87,12 +90,56 @@ function EmizunManager(connection) {
         ]);
     }
 
+    EmizunManager.prototype._addNewProduct = function () {
+        var departments = ["Home & Kitchen", "Tools & Home Improvement", "Electronics", "Clothing", "Garden & Outdoor", "Health & Wellness"];
+
+        return util.prompt
+            .input("name", "Enter the product name:")
+            .list("dept", "Select the product department:", departments)
+            .input("price", "Enter the product price (in cents):")
+            .input("qty", "Enter the starting quantity:")
+            .then(result => {
+                var intQty = parseInt(result.qty);
+                var intPrice = parseInt(result.price);
+                var floatPrice = parseFloat(result.price);
+                var error = null;
+
+                if (isNaN(intQty) || intQty < 0) error = appendError(error, "Invalid quantity: should be a valid number >= 0.");
+                if (isNaN(intPrice) || intPrice <= 0 || intPrice != floatPrice) error = appendError(error, "Invalid price: price must be a valid positive integer.");
+                if (!result.name) error = appendError(error, "Name missing.");
+
+                if (error) {
+                    console.log("Could not process your request due to an error:\n" + error);
+                    return util.prompt
+                        .confirm("retry", "Try again?", false)
+                        .then(confirm => {
+                            if (confirm.retry) return this._addNewProduct();
+                        });
+                } else {
+                    console.log("Your request is being processed.");
+                    var queryString = "INSERT INTO products (product_name, department_name, price, stock_quantity) VALUES (?, ?, ?, ?)";
+                    var queryValues = [result.name, result.dept, intPrice, intQty];
+                    return connection
+                        .query(queryString, queryValues)
+                        .then(function (result) {
+                            console.log("Your transaction is complete! The new product's stock number is " + result.insertId);
+                    });
+
+                }
+            });
+
+        function appendError(err, msg) {
+            if (err) return err + "\n    " + msg;
+            return "    " + msg;
+        }
+    }
+
     EmizunManager.prototype._displayProducts = function (maxQuantity) {
         this._queryForProducts(maxQuantity).then(function (result) {
             var tableLayout = [-10, 20, -12];
 
             result.unshift(util.tableSeparator);
-            result.unshift({ item_id: "ID", product_name: "Product name", stock_quantity: "Qty in stock" });
+            result.unshift({ item_id: "Stock #", product_name: "Product name", stock_quantity: "Qty in stock" });
 
             var transform = item => [item.item_id, item.product_name, item.stock_quantity];
             util.displayTable(result, tableLayout, util.tableStyles.fattyBox, transform);
