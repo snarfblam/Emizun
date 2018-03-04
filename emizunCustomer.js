@@ -82,10 +82,10 @@ function EmizunCustomer(emizunConnection) {
         var self = this;
 
         return util.prompt.confirm('again', 'Would you like another transaction?', true)
-        .show()
-        .then(function (result) {
-            if (result.again) return self.presentUI();
-        });
+            .show()
+            .then(function (result) {
+                if (result.again) return self.presentUI();
+            });
     }
 
     /** Retrieves a product list. Returns a promise. */
@@ -94,16 +94,10 @@ function EmizunCustomer(emizunConnection) {
     }
 
     EmizunCustomer.prototype._createProductList = function (dbEntries) {
-        var self = this;
-
-        var results = [];
-        dbEntries.forEach(e => {
-            results.push({
-                name: EmizunCustomer.formatProduct(e),
-                value: e,
-                short: EmizunCustomer.formatProductShort(e),
-            });
-        });
+        var results = util.prompt.makeChoices();
+        dbEntries.forEach(entry =>
+            results.add(entry, EmizunCustomer.formatProduct(entry), EmizunCustomer.formatProductShort(entry))
+        );
 
         return results;
     }

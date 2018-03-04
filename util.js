@@ -29,6 +29,28 @@ function formatCurrency(cents) {
 
 function Prompt() {
     this.prompts = [];
+} { // Static
+
+    /** Returns a choices builder object. Has an add(value, display, selectedDisplay) method and
+     * can be provided directly to the 'list' or 'rawList' prompt as the choice list. */
+    Prompt.makeChoices = function (value, display, selectedDisplay) {
+        var result = [];
+
+        result.add = function (value, display, selectedDisplay) {
+            result.push({
+                value: value,
+                name: display,
+                short: (selectedDisplay == undefined) ? display : selectedDisplay,
+            });
+        };
+
+        if (value != undefined) {
+            result.add(value, display, selectedDisplay);
+        }
+
+        return result;
+    }
+
 } { // Methods
 
     Prompt.prototype.input = function (name, message) {
@@ -71,4 +93,5 @@ module.exports.prompt = {
     input: function (name, message) { return new Prompt().input(name, message); },
     list: function (name, message, choices) { return new Prompt().list(name, message, choices); },
     confirm: function (name, message, dfault) { return new Prompt().confirm(name, message, dfault); },
+    makeChoices: function (value, display, selectedDisplay) { return Prompt.makeChoices(value, display, selectedDisplay); },
 }
