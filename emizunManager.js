@@ -22,8 +22,15 @@ function EmizunManager(connection) {
 
         return self._promptForMode()
             .then(function (mode) {
-                return self._executeMode(mode);
-            })
+                return self._executeMode(mode)
+                    .then(function () {
+                        return util.prompt
+                            .confirm("continue", "Perform another managerial action?")
+                            .then(function (result) {
+                                if (result.continue) return self.presentUI();
+                            });
+                    });
+            });
     }
 
     /** Prompts user for mode. Returns a promise that resolves to an EmizunManager.modes value. */
@@ -135,7 +142,7 @@ function EmizunManager(connection) {
     }
 
     EmizunManager.prototype._displayProducts = function (maxQuantity) {
-        this._queryForProducts(maxQuantity).then(function (result) {
+        return this._queryForProducts(maxQuantity).then(function (result) {
             var tableLayout = [-10, 20, -12];
 
             result.unshift(util.tableSeparator);
