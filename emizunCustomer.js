@@ -1,33 +1,8 @@
 require('./polyfill');
 var inquirer = require('inquirer');
 var EmizunConnection = require('./EmizunConnection');
+var util = require('./util');
 
-/** Formats a string to use columns of the specified widths. */
-function tableize(values, widths, columnSeparator) {
-    var result = "";
-
-    for (var i = 0; i < values.length; i++) {
-        if (i > 0 && columnSeparator) result += columnSeparator;
-
-        var value = (values[i] || "null").toString();
-        var width = widths[i] || 10;
-
-        if (value.length > width) {
-            value = value.substr(0, width - 3) + "...";
-        } else if (value.length < width) {
-            value = value.padEnd(width);
-        }
-
-        result += value;
-    }
-
-    return result;
-}
-
-/** Formats a number of cents into a string such as $1.99 */
-function formatCurrency(cents) {
-    return "$" + (cents / 100).toFixed(2)
-}
 
 /** Creates an EmizunCustomer object which queries the database and presents command-line prompts. */
 function EmizunCustomer(emizunConnection) {
@@ -36,11 +11,11 @@ function EmizunCustomer(emizunConnection) {
 } { // static
 
     EmizunCustomer.formatProduct = function (dbEntry) {
-        return tableize([dbEntry.item_id, dbEntry.product_name, formatCurrency(dbEntry.price)], [8, 20, 10], ' | ');
+        return util.tableize([dbEntry.item_id, dbEntry.product_name, util.formatCurrency(dbEntry.price)], [8, 20, 10], ' | ');
     }
 
     EmizunCustomer.formatProductShort = function (dbEntry) {
-        return dbEntry.product_name + " " + "(" + formatCurrency(dbEntry.price) + ")";
+        return dbEntry.product_name + " " + "(" + util.formatCurrency(dbEntry.price) + ")";
     }
 
 } { // methods
@@ -59,7 +34,7 @@ function EmizunCustomer(emizunConnection) {
                 if (qty == 0) {
                     console.log(selectedItem.product_name + " has been removed from your cart.");
                 } else {
-                    console.log("Your total comes to " + formatCurrency(selectedItem.price * qty) + ". Please wait while we process your transaction...");
+                    console.log("Your total comes to " + util.formatCurrency(selectedItem.price * qty) + ". Please wait while we process your transaction...");
                     return self._updateRow(selectedItem.item_id, selectedItem.stock_quantity - qty)
                         .then(function () {
                             console.log("Your order has been placed!");
@@ -78,12 +53,7 @@ function EmizunCustomer(emizunConnection) {
         return this._queryProducts()
             .then(function (result) {
                 var productList = self._createProductList(result);
-                return inquirer.prompt([{
-                    type: 'list',
-                    message: 'Select a product.',
-                    choices: productList,
-                    name: 'item',
-                }]);
+                return util.prompt.list('item', 'Select a product', productList).show();
             }).then(function (result) {
                 return result.item;
             })
@@ -93,35 +63,30 @@ function EmizunCustomer(emizunConnection) {
     EmizunCustomer.prototype._promptForQuantity = function (itemName, maxQty) {
         var self = this;
 
-        return inquirer.prompt([{
-            type: 'input',
-            message: 'Please enter a quantity for ' + itemName + ' (0 - ' + maxQty + '):',
-            name: 'qty'
-        }]).then(function (result) {
-            var qty = parseInt(result.qty);
 
-            if (isNaN(qty) || qty < 0 || qty > maxQty) {
-                // TRY AGAIN, JERK!
-                console.log("A valid number between 0 and " + maxQty + " is required.");
-                return self._promptForQuantity(itemName, maxQty);
-            } else {
-                return qty;
-            }
-        });
+        return util.prompt.input('qty', 'Please enter a quantity for ' + itemName + ' (0 - ' + maxQty + '):')
+            .show()
+            .then(function (result) {
+                var qty = parseInt(result.qty);
+
+                if (isNaN(qty) || qty < 0 || qty > maxQty) {
+                    // TRY AGAIN, JERK!
+                    console.log("A valid number between 0 and " + maxQty + " is required.");
+                    return self._promptForQuantity(itemName, maxQty);
+                } else {
+                    return qty;
+                }
+            });
     }
 
     /** Prompts the user to do another transaction. Returns a promise that resolves when the user is done. */
     EmizunCustomer.prototype._promptForAnotherTransaction = function () {
         var self = this;
 
-        return inquirer.prompt([{
-            type: 'confirm',
-            message: 'Would you like another transaction?',
-            name: 'again',
-        }]).then(function (result) {
-            if (result.again) {
-                return self.presentUI();
-            }
+        return util.prompt.confirm('again', 'Would you like another transaction?', true)
+        .show()
+        .then(function (result) {
+            if (result.again) return self.presentUI();
         });
     }
 
