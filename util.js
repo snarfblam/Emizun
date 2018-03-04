@@ -85,6 +85,8 @@ function _console_log(string) {
     console.log(string);
 }
 
+var inverse = "\x1b[30m\x1b[47m";
+var normal = "\x1b[37m\x1b[40m\x1b[0m";
 var tableStyles = {
     dashes: {
         separator: '-',
@@ -102,6 +104,40 @@ var tableStyles = {
         bottomRight: "",
         top: "-",
         bottom: "-",
+    },
+    inverse: {
+        separator: '─',
+        columnSeparator: ' │ ',
+        intersectionTop: '   ',
+        intersectionMiddle: '─┼─',
+        intersectionBottom: '   ',
+        interesctionLeft: inverse + "─",
+        intersectionRight: "─" + normal,  
+        topLeft: "",
+        left: inverse + " ",
+        bottomLeft: "",
+        topRight: "",
+        right: " " + normal,
+        bottomRight: "",
+        top: " ",
+        bottom: " ",
+    },
+    inverseBorder: {
+        separator: '─',
+        columnSeparator: ' │ ',
+        intersectionTop: '═══',
+        intersectionMiddle: '─┼─',
+        intersectionBottom: '═══',
+        interesctionLeft: "║" + inverse + "─",
+        intersectionRight: "─" + normal + "║",  
+        topLeft: "╔═",
+        topRight: "═╗",
+        bottomLeft: "╚═",
+        bottomRight: "═╝",
+        left: "║" + inverse + " ",
+        right: " " + normal + "║",
+        top: "═",
+        bottom: "═",
     },
     boxDrawing: {
         separator: '─',
@@ -129,11 +165,11 @@ var tableStyles = {
         interesctionLeft: "╟─",
         intersectionRight: "─╢",    
         topLeft: "╔═",
-        left: "║ ",
-        bottomLeft: "╚═",
         topRight: "═╗",
-        right: " ║",
+        bottomLeft: "╚═",
         bottomRight: "═╝",
+        left: "║ ",
+        right: " ║",
         top: "═", 
         bottom: "═",
     }
