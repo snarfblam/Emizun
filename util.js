@@ -1,7 +1,7 @@
 var inquirer = require('inquirer');
 
 /** Formats a string to use columns of the specified widths. */
-function tableize(values, widths, columnSeparator,) {
+function tableize(values, widths, columnSeparator, ) {
     var result = "";
 
     for (var i = 0; i < values.length; i++) {
@@ -9,11 +9,17 @@ function tableize(values, widths, columnSeparator,) {
 
         var value = (values[i] || "null").toString();
         var width = widths[i] || 10;
+        var rightAlign = width < 0;
+        width = Math.abs(width);
 
         if (value.length > width) {
             value = value.substr(0, width - 3) + "...";
         } else if (value.length < width) {
-            value = value.padEnd(width);
+            if (rightAlign) {
+                value = value.padStart(width);
+            } else {
+                value = value.padEnd(width);
+            }
         }
 
         result += value;
@@ -26,7 +32,7 @@ function tableSeparator(columnWidths, columnSeparator, separatorChar) {
     var result = "";
     for (var i = 0; i < columnWidths.length; i++) {
         if (i > 0) result += columnSeparator;
-        result += (separatorChar || '-').repeat(columnWidths[i]);
+        result += (separatorChar || '-').repeat(Math.abs(columnWidths[i]));
     }
 
     return result;
@@ -49,22 +55,31 @@ function displayTable(data, columnLayout, tableStyle, dataTransform, outputFunct
     // doet
     outputFunction(
         finalStyle.topLeft +
-        tableSeparator(columnLayout, finalStyle.intersectionTop, finalStyle.separator) + 
+        tableSeparator(columnLayout, finalStyle.intersectionTop, finalStyle.separator) +
         finalStyle.topRight);
-    
+
     data.forEach(function (item) {
-        if (dataTransform) item = dataTransform(item);
-        outputFunction(
-            finalStyle.left + 
-            tableize(item, columnLayout, finalStyle.columnSeparator, outputFunction) +
-            finalStyle.right);
+        if (item == tableSeparator) {
+            outputFunction(
+                finalStyle.left +
+                tableSeparator(columnLayout, finalStyle.intersectionMiddle, finalStyle.separator) +
+                finalStyle.right);
+        } else {
+            if (dataTransform) item = dataTransform(item);
+            outputFunction(
+                finalStyle.left +
+                tableize(item, columnLayout, finalStyle.columnSeparator, outputFunction) +
+                finalStyle.right);
+            }
     });
 
     outputFunction(
         finalStyle.bottomLeft +
-        tableSeparator(columnLayout, finalStyle.intersectionBottom, finalStyle.separator) + 
+        tableSeparator(columnLayout, finalStyle.intersectionBottom, finalStyle.separator) +
         finalStyle.bottomRight);
 }
+
+var tableSeparator = {};
 
 function _console_log(string) {
     console.log(string);
@@ -170,6 +185,7 @@ module.exports.tableSeparator = tableSeparator;
 module.exports.formatCurrency = formatCurrency;
 module.exports.displayTable = displayTable;
 module.exports.tableStyles = tableStyles;
+module.exports.tableSeparator = tableSeparator;
 // module.exports.prompt = function () { return new Prompt(); }
 module.exports.prompt = {
     input: function (name, message) { return new Prompt().input(name, message); },
