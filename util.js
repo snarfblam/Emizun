@@ -99,6 +99,7 @@ function Prompt() {
 
 
 module.exports.tableize = tableize;
+module.exports.tableSeparator = tableSeparator;
 module.exports.formatCurrency = formatCurrency;
 // module.exports.prompt = function () { return new Prompt(); }
 module.exports.prompt = {
