@@ -37,11 +37,13 @@ function Prompt() {
         var result = [];
 
         result.add = function (value, display, selectedDisplay) {
-            result.push({
+            this.push({
                 value: value,
                 name: display,
                 short: (selectedDisplay == undefined) ? display : selectedDisplay,
             });
+
+            return this;
         };
 
         if (value != undefined) {
