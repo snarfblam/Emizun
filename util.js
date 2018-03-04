@@ -55,7 +55,7 @@ function displayTable(data, columnLayout, tableStyle, dataTransform, outputFunct
     // doet
     outputFunction(
         finalStyle.topLeft +
-        createTableSeparator(columnLayout, finalStyle.intersectionTop, finalStyle.separator) +
+        createTableSeparator(columnLayout, finalStyle.intersectionTop, finalStyle.top) +
         finalStyle.topRight);
 
     data.forEach(function (item) {
@@ -75,7 +75,7 @@ function displayTable(data, columnLayout, tableStyle, dataTransform, outputFunct
 
     outputFunction(
         finalStyle.bottomLeft +
-        createTableSeparator(columnLayout, finalStyle.intersectionBottom, finalStyle.separator) +
+        createTableSeparator(columnLayout, finalStyle.intersectionBottom, finalStyle.bottom) +
         finalStyle.bottomRight);
 }
 
@@ -100,6 +100,8 @@ var tableStyles = {
         topRight: "",
         right: "",
         bottomRight: "",
+        top: "-",
+        bottom: "-",
     },
     boxDrawing: {
         separator: '─',
@@ -115,6 +117,25 @@ var tableStyles = {
         topRight: "─┐",
         right: " │",
         bottomRight: "─┘",
+        top: "─",
+        bottom: "─",
+    },
+    fattyBox: { //╔═╤╗╟─┼╢╚═╧╝
+        separator: '─',
+        columnSeparator: ' │ ',
+        intersectionTop: '═╤═',
+        intersectionMiddle: '─┼─',
+        intersectionBottom: '═╧═',
+        interesctionLeft: "╟─",
+        intersectionRight: "─╢",    
+        topLeft: "╔═",
+        left: "║ ",
+        bottomLeft: "╚═",
+        topRight: "═╗",
+        right: " ║",
+        bottomRight: "═╝",
+        top: "═", 
+        bottom: "═",
     }
 }
 
