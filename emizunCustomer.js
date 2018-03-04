@@ -1,5 +1,4 @@
 require('./polyfill');
-var inquirer = require('inquirer');
 var EmizunConnection = require('./EmizunConnection');
 var util = require('./util');
 
@@ -28,7 +27,6 @@ function EmizunCustomer(emizunConnection) {
         return self._promptForProduct()
             .then(function (item) {
                 selectedItem = item;
-
                 return self._promptForQuantity(item.product_name, item.stock_quantity);
             }).then(function (qty) {
                 if (qty == 0) {
@@ -129,9 +127,11 @@ var customer = new EmizunCustomer(connection);
 connection.connect()
     .then(function () {
         return customer.presentUI();
-    }).catch(function (err) {
-        console.log(err);
     }).then(function () {
         console.log("Thanks for shopping.")
+    }).catch(function (err) {
+        console.log(err);
+        console.log("There's been an error. So sorry mate!");
+    }).then(function () {
         connection.disconnect();
     });
