@@ -208,13 +208,48 @@ function Prompt() {
         return result;
     }
 
-} { // Static
-
-    Prompt._applyOptions = function (prompt, options) {
-        for (key in options) {
-            prompt[key] = options[key];
+    Prompt.options = {
+        validateNumber: {
+            validate: function(value) {
+                var numValue = parseFloat(value);
+                if (isNaN(numValue)) return "Please enter a valid number."
+                return true;
+            }
+        },
+        validateInt: {
+            validate: function (value) {
+                var numValue = parseFloat(value);
+                var intValue = parseInt(value);
+                if (isNaN(intValue)) return "Please enter a valid integer."
+                if (intValue != numValue) return "Please enter a valid integer.";
+                return true;
+            }
+        },
+        validateNotblank: function(value) {
+            if (!value && value !== 0) return "This field can not be blank.";
+            return true;
         }
     }
+
+} { // Static
+
+    /** Applies each property on 'options' to the 'prompt' object. If 'options' is an array
+     * then this operation is performed on each item in the 'options' array      */
+    Prompt._applyOptions = function (prompt, options) {
+        if (options instanceof Array) {
+            options.forEach(function (opt) {
+                for (key in opt) {
+                    prompt[key] = opt[key];
+                } 
+            });
+        } else {
+            for (key in options) {
+                prompt[key] = options[key];
+            }
+        }    
+    }
+
+    //Prompt.numericValidator = 
 
 } { // Methods
 
@@ -271,4 +306,5 @@ module.exports.prompt = {
     confirm: function (name, message, dfault) { return new Prompt().confirm(name, message, dfault, options); },
     /** Returns an object with method .add(value, display, [selectionDisplay]) that can be chained to construct a choices list. */
     makeChoices: function (value, display, selectedDisplay) { return Prompt.makeChoices(value, display, selectedDisplay); },
+    options: Prompt.options,
 }
