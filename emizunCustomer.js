@@ -1,6 +1,7 @@
 require('./polyfill');
 var EmizunConnection = require('./EmizunConnection');
 var util = require('./util');
+var prompt = require('./prompt');
 
 
 /** Creates an EmizunCustomer object which queries the database and presents command-line prompts. */
@@ -53,7 +54,7 @@ function EmizunCustomer(emizunConnection) {
         return this._queryProducts()
             .then(function (result) {
                 var productList = self._createProductList(result);
-                return util.prompt.list('item', 'Select a product', productList).show();
+                return prompt.list('item', 'Select a product', productList).show();
             }).then(function (result) {
                 return result.item;
             })
@@ -64,7 +65,7 @@ function EmizunCustomer(emizunConnection) {
         var self = this;
 
 
-        return util.prompt.input('qty', 'Please enter a quantity for ' + itemName + ' (0 - ' + maxQty + '):')
+        return prompt.input('qty', 'Please enter a quantity for ' + itemName + ' (0 - ' + maxQty + '):')
             .show()
             .then(function (result) {
                 var qty = parseInt(result.qty);
@@ -83,7 +84,7 @@ function EmizunCustomer(emizunConnection) {
     EmizunCustomer.prototype._promptForAnotherTransaction = function () {
         var self = this;
 
-        return util.prompt.confirm('again', 'Would you like another transaction?', true)
+        return prompt.confirm('again', 'Would you like another transaction?', true)
             .show()
             .then(function (result) {
                 if (result.again) return self.presentUI();
@@ -96,7 +97,7 @@ function EmizunCustomer(emizunConnection) {
     }
 
     EmizunCustomer.prototype._createProductList = function (dbEntries) {
-        var results = util.prompt.makeChoices();
+        var results = prompt.makeChoices();
         dbEntries.forEach(entry =>
             results.add(entry, EmizunCustomer.formatProduct(entry), EmizunCustomer.formatProductShort(entry))
         );

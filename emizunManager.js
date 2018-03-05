@@ -1,7 +1,7 @@
 require('./polyfill');
 var EmizunConnection = require('./EmizunConnection');
 var util = require('./util');
-
+var prompt = require('./prompt');
 
 function EmizunManager(connection) {
     /** @type {EmizunConnection} */
@@ -24,7 +24,7 @@ function EmizunManager(connection) {
             .then(function (mode) {
                 return self._executeMode(mode)
                     .then(function () {
-                        return util.prompt
+                        return prompt
                             .confirm("continue", "Perform another managerial action?")
                             .then(function (result) {
                                 if (result.continue) return self.presentUI();
@@ -37,14 +37,13 @@ function EmizunManager(connection) {
     EmizunManager.prototype._promptForMode = function () {
         var modes = EmizunManager.modes;
 
-        var choices = util.prompt.makeChoices()
+        var choices = prompt.makeChoices()
             .add(modes.viewProducts, "View products")
             .add(modes.viewLowInventory, "View low inventory")
             .add(modes.addToInventory, "Add to inventory")
             .add(modes.addNewProduct, "Add new product");
 
-        return util.prompt
-            .list('mode', "Please select an operation", choices)
+        return prompt.list('mode', "Please select an operation", choices)
             .then(function (result) {
                 return result.mode;
             });
@@ -100,7 +99,7 @@ function EmizunManager(connection) {
     EmizunManager.prototype._addNewProduct = function () {
         var departments = ["Home & Kitchen", "Tools & Home Improvement", "Electronics", "Clothing", "Garden & Outdoor", "Health & Wellness"];
 
-        return util.prompt
+        return prompt
             .input("name", "Enter the product name:")
             .list("dept", "Select the product department:", departments)
             .input("price", "Enter the product price (in cents):")
@@ -117,8 +116,7 @@ function EmizunManager(connection) {
 
                 if (error) {
                     console.log("Could not process your request due to an error:\n" + error);
-                    return util.prompt
-                        .confirm("retry", "Try again?", false)
+                    return prompt.confirm("retry", "Try again?", false)
                         .then(confirm => {
                             if (confirm.retry) return this._addNewProduct();
                         });
@@ -158,14 +156,13 @@ function EmizunManager(connection) {
     EmizunManager.prototype._promptForProduct = function () {
         var tableLayout = [-10, 20, -12];
         return this._queryForProducts().then(function (result) {
-            var choices = util.prompt.makeChoices();
+            var choices = prompt.makeChoices();
             result.forEach(function (item) {
                 var display = util.tableize([item.item_id, item.product_name, item.stock_quantity], tableLayout, " | ");
                 choices.add(item, display, item.product_name);
             });
 
-            return util.prompt
-                .list("item", "Select an item", choices)
+            return prompt.list("item", "Select an item", choices)
                 .then(function (result) {
                     return result.item;
                 });
@@ -173,8 +170,7 @@ function EmizunManager(connection) {
     }
 
     EmizunManager.prototype._promptForQuantity = function (itemName) {
-        return util.prompt
-            .input("qty", "Enter quantity for '" + itemName + "':")
+        return prompt.input("qty", "Enter quantity for '" + itemName + "':")
             .then(result => {
                 var intResult = parseInt(result.qty);
                 if (isNaN(intResult)) {
@@ -183,8 +179,7 @@ function EmizunManager(connection) {
                 } else if (intResult >= 0) {
                     return intResult;
                 } else {
-                    return util.prompt
-                        .confirm("confirm", "Are you sure you want to remove from inventory?", true)
+                    return prompt.confirm("confirm", "Are you sure you want to remove from inventory?", true)
                         .then(confirmResult => {
                             if (confirmResult.confirm) {
                                 return intResult;

@@ -1,6 +1,7 @@
 require('./polyfill');
 var EmizunConnection = require('./EmizunConnection');
 var util = require('./util');
+var prompt = require('./prompt');
 
 
 function EmizunSupervisor(connection) {
@@ -21,8 +22,7 @@ function EmizunSupervisor(connection) {
     EmizunSupervisor.prototype.presentUI = function () {
         return this._promptForMode()
             .then(() => {
-                return util.prompt
-                    .confirm("continue", "Would you like to perform additional tasks?")
+                return prompt.confirm("continue", "Would you like to perform additional tasks?")
                     .then(input => {
                         if (input.continue) return this.presentUI();
                     })
@@ -30,8 +30,7 @@ function EmizunSupervisor(connection) {
     }
 
     EmizunSupervisor.prototype._promptForMode = function () {
-        return util.prompt
-            .list("mode", "Select an operation:", EmizunSupervisor.modeChoices)
+        return prompt.list("mode", "Select an operation:", EmizunSupervisor.modeChoices)
             .then(input => {
                 switch (input.mode) {
                     case EmizunSupervisor.modes.viewDepartments:
@@ -43,14 +42,17 @@ function EmizunSupervisor(connection) {
     }
 
     EmizunSupervisor.prototype._createDepartment = function () {
-        return util.prompt
-            .input("department_name", "Enter the name of the department you wish to register:")
-            .input("overhead_costs", "Enter the dept. estimated overhead (dollars):", util.prompt.options.validateInt)
+        return prompt
+            .input("department_name", "Enter the name of the department you wish to register:", prompt.options.validateNotblank)
+            .input("overhead_costs", "Enter the dept. estimated overhead (dollars):", prompt.options.validateInt)
             .then(dept => {
                 dept.overhead_costs *= 100; // Convert dollars to cents
 
                 query = "INSERT INTO departments (department_name, overhead_costs) VALUES (?, ?);";
                 return this.connection.query(query, [dept.department_name, dept.overhead_costs]);
+            })
+            .then(() => { 
+                console.log("The department has been registered and will display in your reports.");
             });
     }
 
