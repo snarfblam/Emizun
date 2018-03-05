@@ -1,6 +1,6 @@
 require('./polyfill');
 var EmizunConnection = require('./EmizunConnection');
-var util = require('./util');
+var table = require('./table');
 var prompt = require('./prompt');
 
 
@@ -11,11 +11,11 @@ function EmizunCustomer(emizunConnection) {
 } { // static
 
     EmizunCustomer.formatProduct = function (dbEntry) {
-        return util.tableize([dbEntry.item_id, dbEntry.product_name, util.formatCurrency(dbEntry.price)], [8, 20, 10], ' | ');
+        return table.tableize([dbEntry.item_id, dbEntry.product_name, table.formatCurrency(dbEntry.price)], [8, 20, 10], ' | ');
     }
 
     EmizunCustomer.formatProductShort = function (dbEntry) {
-        return dbEntry.product_name + " " + "(" + util.formatCurrency(dbEntry.price) + ")";
+        return dbEntry.product_name + " " + "(" + table.formatCurrency(dbEntry.price) + ")";
     }
 
 } { // methods
@@ -35,7 +35,7 @@ function EmizunCustomer(emizunConnection) {
                 } else {
                     var totalPrice = selectedItem.price * qty;
                     var totalSales = selectedItem.product_sales + totalPrice;
-                    console.log("Your total comes to " + util.formatCurrency(totalPrice) + ". Please wait while we process your transaction...");
+                    console.log("Your total comes to " + table.formatCurrency(totalPrice) + ". Please wait while we process your transaction...");
                     return self._updateRow(selectedItem.item_id, selectedItem.stock_quantity - qty, totalSales)
                         .then(function () {
                             console.log("Your order has been placed!");

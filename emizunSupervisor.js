@@ -1,6 +1,6 @@
 require('./polyfill');
 var EmizunConnection = require('./EmizunConnection');
-var util = require('./util');
+var table = require('./table');
 var prompt = require('./prompt');
 
 
@@ -62,7 +62,7 @@ function EmizunSupervisor(connection) {
         return this._queryDepartmentsSummary()
             .then(summary => {
                 // Table heading
-                summary.unshift(util.tableSeparator);
+                summary.unshift(table.tableSeparator);
                 summary.unshift({
                     department_id: "Dept ID",
                     department_name: "Dept Name",
@@ -71,10 +71,10 @@ function EmizunSupervisor(connection) {
                     total_profit: "Profit",
                 });
 
-                util.displayTable(
+                table.displayTable(
                     summary,
                     tableLayout,
-                    util.tableStyles.fattyBox,
+                    table.tableStyles.fattyBox,
                     entry => [
                         entry.department_id,
                         entry.department_name,
@@ -85,7 +85,7 @@ function EmizunSupervisor(connection) {
             });
 
         function formatCurrency(c) {
-            if (typeof c == 'number') return util.formatCurrency(c);
+            if (typeof c == 'number') return table.formatCurrency(c);
             return c;
         }
     }

@@ -1,6 +1,6 @@
 require('./polyfill');
 var EmizunConnection = require('./EmizunConnection');
-var util = require('./util');
+var table = require('./table');
 var prompt = require('./prompt');
 
 function EmizunManager(connection) {
@@ -143,11 +143,11 @@ function EmizunManager(connection) {
         return this._queryForProducts(maxQuantity).then(function (result) {
             var tableLayout = [-10, 20, -12];
 
-            result.unshift(util.tableSeparator);
+            result.unshift(table.tableSeparator);
             result.unshift({ item_id: "Stock #", product_name: "Product name", stock_quantity: "Qty in stock" });
 
             var transform = item => [item.item_id, item.product_name, item.stock_quantity];
-            util.displayTable(result, tableLayout, util.tableStyles.fattyBox, transform);
+            table.displayTable(result, tableLayout, table.tableStyles.fattyBox, transform);
             console.log(result.length - 2 + " item(s)"); // -2 for header and separator
         })
     }
@@ -158,7 +158,7 @@ function EmizunManager(connection) {
         return this._queryForProducts().then(function (result) {
             var choices = prompt.makeChoices();
             result.forEach(function (item) {
-                var display = util.tableize([item.item_id, item.product_name, item.stock_quantity], tableLayout, " | ");
+                var display = table.tableize([item.item_id, item.product_name, item.stock_quantity], tableLayout, " | ");
                 choices.add(item, display, item.product_name);
             });
 
