@@ -231,8 +231,6 @@ function Prompt() {
         }
     }
 
-} { // Static
-
     /** Applies each property on 'options' to the 'prompt' object. If 'options' is an array
      * then this operation is performed on each item in the 'options' array      */
     Prompt._applyOptions = function (prompt, options) {
@@ -301,9 +299,9 @@ module.exports.tableStyles = tableStyles;
 module.exports.tableSeparator = tableSeparator;
 // module.exports.prompt = function () { return new Prompt(); }
 module.exports.prompt = {
-    input: function (name, message) { return new Prompt().input(name, message, options); },
-    list: function (name, message, choices) { return new Prompt().list(name, message, choices, options); },
-    confirm: function (name, message, dfault) { return new Prompt().confirm(name, message, dfault, options); },
+    input: function (name, message, options) { return new Prompt().input(name, message, options); },
+    list: function (name, message, choices, options) { return new Prompt().list(name, message, choices, options); },
+    confirm: function (name, message, dfault, options) { return new Prompt().confirm(name, message, dfault, options); },
     /** Returns an object with method .add(value, display, [selectionDisplay]) that can be chained to construct a choices list. */
     makeChoices: function (value, display, selectedDisplay) { return Prompt.makeChoices(value, display, selectedDisplay); },
     options: Prompt.options,

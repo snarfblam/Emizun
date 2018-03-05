@@ -36,3 +36,15 @@ CREATE TABLE departments (
 );
 
 INSERT INTO emizun.departments (department_name, overhead_costs) VALUES ('Health & Wellness', '10000');
+
+SELECT 
+	department_id,
+    departments.department_name, 
+    overhead_costs,
+    SUM(product_sales) AS department_sales,
+    (SUM(product_sales) - overhead_costs) AS total_profit
+FROM 
+	products 
+		INNER JOIN 
+	departments USING (department_name) 
+GROUP BY department_name;
