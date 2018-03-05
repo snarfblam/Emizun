@@ -1,3 +1,7 @@
+# In theory, this script should create and intialize a database that will work with Emizun
+# I have not tested it all at once
+# Quirks remain for my own reference, particularly the command to alter a table after it is created
+
 create database emizun;
 use emizun;
 
@@ -24,8 +28,9 @@ INSERT INTO `emizun`.`products` (`item_id`, `product_name`, `department_name`, `
 INSERT INTO `emizun`.`products` (`item_id`, `product_name`, `department_name`, `price`, `stock_quantity`) VALUES ('9', 'Flex Seal', 'Tools & Home Improvement', '1299', '30');
 INSERT INTO `emizun`.`products` (`item_id`, `product_name`, `department_name`, `price`, `stock_quantity`) VALUES ('10', 'Music Bullet', 'Electronics', '2499', '40');
 
-UPDATE products SET product_sales='0';
-UPDATE products SET product_sales='0' WHERE item_id >= 0;
+
+UPDATE products SET product_sales='0'; # workbench does not allow this in safe mode
+UPDATE products SET product_sales='0' WHERE item_id >= 0; # works in safe mode
 
 
 CREATE TABLE departments (
@@ -48,3 +53,4 @@ FROM
 		INNER JOIN 
 	departments USING (department_name) 
 GROUP BY department_name;
+
