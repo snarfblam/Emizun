@@ -225,9 +225,11 @@ function Prompt() {
                 return true;
             }
         },
-        validateNotblank: function(value) {
-            if (!value && value !== 0) return "This field can not be blank.";
-            return true;
+        validateNotblank: {
+            validate: function (value) {
+                if (!value && value !== 0) return "This field can not be blank.";
+                return true;
+            }    
         }
     }
 
