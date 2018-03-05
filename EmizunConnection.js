@@ -1,14 +1,9 @@
 require('./polyfill');
 var mysql = require('mysql');
+var databaseConfig = require('./emizunDB')
 
 function EmizunConnection() {
-    this.connection = mysql.createConnection({
-        host: 'localhost',
-        port: 3306,
-        user: 'root',
-        password: 'sequelitis',
-        database: 'emizun',
-    });
+    this.connection = mysql.createConnection(databaseConfig);
 
     this.connected = false;
 } { // methods
