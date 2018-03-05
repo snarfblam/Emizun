@@ -208,29 +208,40 @@ function Prompt() {
         return result;
     }
 
+} { // Static
+
+    Prompt._applyOptions = function (prompt, options) {
+        for (key in options) {
+            prompt[key] = options[key];
+        }
+    }
+
 } { // Methods
 
-    Prompt.prototype.input = function (name, message) {
+    Prompt.prototype.input = function (name, message, options) {
         var prompt = { type: 'input', name: name };
         if (message) prompt.message = message;
+        Prompt._applyOptions(prompt, options);
 
         this.prompts.push(prompt);
         return this;
     };
 
-    Prompt.prototype.list = function (name, message, choices) {
+    Prompt.prototype.list = function (name, message, choices, options) {
         var prompt = { type: 'list', name: name, choices: choices };
         if (message) prompt.message = message;
+        Prompt._applyOptions(prompt, options);
 
 
         this.prompts.push(prompt);
         return this;
     };
 
-    Prompt.prototype.confirm = function (name, message, dfault) {
+    Prompt.prototype.confirm = function (name, message, dfault, options) {
         var prompt = { type: 'confirm', name: name };
         if (message) prompt.message = message;
         if (dfault != undefined) prompt.default = dfault;
+        Prompt._applyOptions(prompt, options);
 
 
         this.prompts.push(prompt);
@@ -255,8 +266,9 @@ module.exports.tableStyles = tableStyles;
 module.exports.tableSeparator = tableSeparator;
 // module.exports.prompt = function () { return new Prompt(); }
 module.exports.prompt = {
-    input: function (name, message) { return new Prompt().input(name, message); },
-    list: function (name, message, choices) { return new Prompt().list(name, message, choices); },
-    confirm: function (name, message, dfault) { return new Prompt().confirm(name, message, dfault); },
+    input: function (name, message) { return new Prompt().input(name, message, options); },
+    list: function (name, message, choices) { return new Prompt().list(name, message, choices, options); },
+    confirm: function (name, message, dfault) { return new Prompt().confirm(name, message, dfault, options); },
+    /** Returns an object with method .add(value, display, [selectionDisplay]) that can be chained to construct a choices list. */
     makeChoices: function (value, display, selectedDisplay) { return Prompt.makeChoices(value, display, selectedDisplay); },
 }
