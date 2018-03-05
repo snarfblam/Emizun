@@ -19,7 +19,14 @@ function EmizunSupervisor(connection) {
 } { // Methods 
 
     EmizunSupervisor.prototype.presentUI = function () {
-        return this._promptForMode();
+        return this._promptForMode()
+            .then(() => {
+                return util.prompt
+                    .confirm("continue", "Would you like to perform additional tasks?")
+                    .then(input => {
+                        if (input.continue) return this.presentUI();
+                    })
+            });
     }
 
     EmizunSupervisor.prototype._promptForMode = function () {
@@ -30,7 +37,7 @@ function EmizunSupervisor(connection) {
                     case EmizunSupervisor.modes.viewDepartments:
                         return this._logDepartmentsSummary();
                     case EmizunSupervisor.modes.addDepartment:
-                        return this._createDepartment();    
+                        return this._createDepartment();
                 }
             });
     }
