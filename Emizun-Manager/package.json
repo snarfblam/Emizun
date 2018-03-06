@@ -1,0 +1,24 @@
+{
+  "name": "emizun-manager",
+  "version": "1.0.0",
+  "description": "CLI application that provides a make-pretend store-front for make-pretend people to buy make-pretend products",
+  "main": "emizunManager.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/snarfblam/Emizun.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/snarfblam/Emizun/issues"
+  },
+  "homepage": "https://github.com/snarfblam/Emizun#readme",
+  "dependencies": {
+    "inquirer": "^5.1.0",
+    "mysql": "^2.15.0"
+  }
+}

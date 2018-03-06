@@ -1,7 +1,7 @@
 var inquirer = require('inquirer');
 
 /** Formats a string to use columns of the specified widths. */
-function tableize(values, widths, columnSeparator, ) {
+function tableize(values, widths, columnSeparator ) {
     var result = "";
 
     for (var i = 0; i < values.length; i++) {
