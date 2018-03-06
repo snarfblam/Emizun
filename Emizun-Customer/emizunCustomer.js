@@ -1,7 +1,8 @@
 require('./polyfill');
-var EmizunConnection = require('./EmizunConnection');
-var table = require('./table');
-var prompt = require('./prompt');
+var util = require('emizun-util');
+var table = util.table; //require('./table');
+var prompt = util.prompt; //require('./prompt');
+var EmizunConnection = util.EmizunConnection; //require('./EmizunConnection');
 
 
 /** Creates an EmizunCustomer object which queries the database and presents command-line prompts. */
