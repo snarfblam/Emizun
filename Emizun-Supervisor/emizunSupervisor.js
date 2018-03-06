@@ -1,7 +1,8 @@
 require('./polyfill');
-var EmizunConnection = require('./EmizunConnection');
-var table = require('./table');
-var prompt = require('./prompt');
+var util = require('emizun-util');
+var EmizunConnection = util.EmizunConnection; //require('./EmizunConnection');
+var table = util.table; //require('./table');
+var prompt = util.prompt; //require('./prompt');
 
 
 function EmizunSupervisor(connection) {
