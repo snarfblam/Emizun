@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/snarfblam/Emizun#readme",
   "dependencies": {
+    "emizun-util": "file:../Emizun-Util",
     "inquirer": "^5.1.0",
     "mysql": "^2.15.0"
   }
