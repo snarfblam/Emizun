@@ -15,8 +15,8 @@ Emizun consists of the user interface packages as well as a separate package for
 2. [emizun-supervisor](#emizun-supervisor)
 3. [emizun-manager](#emizun-manager)
 4. [emizun-util](#emizun-util)
-    1. [emizun-util.table](#emizun-util.table)
-    2. [emizun-util.prompt](#emizun-util.prompt)
+    1. [emizun-util.table](#emizun-utiltable)
+    2. [emizun-util.prompt](#emizun-utilprompt)
 
 ---    
 ## emizun-customer
