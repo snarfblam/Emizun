@@ -58,7 +58,7 @@ Emizun consists of three user interface packages as well as a separate package f
 `emizun-util` defines functionality common to all three above packages and is the sole (explicit) dependency of each. `emizun-util` consists of the following files:
 ```
 ▼ Emizun-Util/
-├───emizunUtil.js         Primary module, exports {table, prompt, 
+├───emizunUtil.js         Primary module. Exports: {table, prompt, 
 │                           EmmizunConnection}
 ├───emizunDB.json         Database connection parameters (for 
 │                           mysql.createConnection)
@@ -79,7 +79,7 @@ The table object provides the following useful members:
     Placeholder object that can be placed in the top-level array given to `displayTable()` which will render as a horizontal separator in the table.
  * `tableStyles` 
 
-    Provides differeent styles tables may be rendered in: `dashes`, `inverse`, `inverseBorder`, `boxDrawing`, and `fattyBox`.
+    Provides different styles tables may be rendered in: `dashes`, `inverse`, `inverseBorder`, `boxDrawing`, and `fattyBox`.
  * `tableize(columns, columnWidths)`
  
     Formats a single row into columns using the same column definitions as `displayTable()`.
@@ -121,7 +121,7 @@ var languages = emizunUtil.prompt.makeChoices()
     
 emizunUtil.prompt
     .input('name', 'Enter your name.')
-    .input('age', 'Enter your age.', emizunUtil.prompt.validateInt)
+    .input('age', 'Enter your age.', emizunUtil.prompt.options.validateInt)
     .list('language', 'Select a language.', languages)
     .confirm('agree', 'Do you agree to the terms of use?')
     .then(data => {
