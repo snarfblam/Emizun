@@ -47,7 +47,7 @@ Your order has been placed!
 ║        1 │ Health & Wellness    │  $10000.00 │   $1992.95 │  $-8007.05 ║
 ╚══════════╧══════════════════════╧════════════╧════════════╧════════════╝
 ```
-**Register new department** will prompt you to enter a department name to be tracked. This should match the department names entered for individual inventory items *exactly*.
+**Register new department** will prompt you to enter a department name to be tracked. This should match the department names entered for individual inventory items *exactly*. You will also be prompted to enter the department's estimated overhead cost.
 
 ---
 ## emizun-manager
@@ -171,14 +171,14 @@ The prompt object wraps inquirer and provides the following useful members.
  * `input(name, message, options?)`
  
     Defines an input prompt.
- * `list(name, message, options?)` 
+ * `list(name, message, choices, options?)` 
 
-    Defines a list prompt.
- * `confirm(name, message, choices, default?, options?)` 
+    Defines a list prompt. Choices should be an array containing string or choice objects or the choice list produced by `makeChoices().add()`.
+ * `confirm(name, message, default?, options?)` 
 
     Defines a confirm prompt.
 
-`input()`, `list()`, and `confirm()` return a `Prompt` object, and these functions can be chained. 
+`input()`, `list()`, and `confirm()` may be chained to create a series of prompts. The return value is a `Prompt` object.
 
 The Prompt object further provides the following methods:
  * `show()` 
